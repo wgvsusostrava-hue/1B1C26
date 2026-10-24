@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog — SUŠ Ostrava</title>
+    <style>
+        /* -------------------------------------------------- */
+        /* IMPORTOVANÉ FONTY                                  */
+        /* -------------------------------------------------- */
+        @font-face {
+            font-family: 'Coolvetica Book';
+            src: url('Coolvetica-Book.woff2') format('woff2'),
+                 url('Coolvetica-Book.woff') format('woff');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Lufga';
+            src: url('fonts/Lufga-Regular.woff2') format('woff2'),
+                 url('fonts/Lufga-Regular.woff') format('woff');
+            font-weight: 400;
+        }
+
+        /* -------------------------------------------------- */
+        /* ZÁKLADNÍ RESET A STYLY                             */
+        /* -------------------------------------------------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        section {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 1rem;
+        }
+
+
+        /* -------------------------------------------------- */
+        /* 0. SEKCE: ÚVODNÍ TEXT (SVG)                        */
+        /* -------------------------------------------------- */
+        #sec-uvod {
+            padding: 2rem 0;
+        }
+
+        .intro-section {
+            width: 100%;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .intro-track {
+            position: relative;
+            width: 2000px;
+            margin: 0 auto;
+        }
+
+        .intro-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .snap-point { display: none; }
+
+        @media (max-width: 768px) {
+            .intro-section {
+                scroll-snap-type: x mandatory;
+            }
+            .intro-track {
+                width: 200vw;
+                margin: 0;
+            }
+            .snap-point {
+                display: block;
+                position: absolute;
+                top: 0;
+                width: 100vw;
+                height: 100%;
+                scroll-snap-align: start;
+                pointer-events: none;
+            }
+            .snap-left { left: 0; }
+            .snap-right { left: 100vw; }
+        }
+
+
+        /* -------------------------------------------------- */
+        /* 1. SEKCE: OTÁZKY (INTERAKTIVNÍ HÁD)                 */
+        /* -------------------------------------------------- */
+        #sec-otazky {
+            padding: 0;
+        }
+
+        #otazky-queue {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            height: 100dvh;
+            box-sizing: border-box;
+        }
+
+        .snake-stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            overflow: hidden;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .center-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .center-hint {
+            font-family: "Coolvetica Book", "Kalam", cursive;
+            color: #333;
+            font-size: 15px;
+            transition: opacity 0.4s;
+        }
+
+        .count-badge {
+            font-family: 'Lufga', sans-serif;
+            font-size: 13px;
+            color: #333;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes snakeColorPulse {
+            0%   { fill: #1fa15a; }
+            25%  { fill: #ec3d8f; }
+            50%  { fill: #2aa9dd; }
+            75%  { fill: #f4d21a; }
+            100% { fill: #1fa15a; }
+        }
+
+        .snake-text {
+            font-family: 'Lufga', 'Coolvetica Book', sans-serif;
+            font-size: clamp(20px, 4.5vw, 28px);
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            fill: #1fa15a;
+            animation: snakeColorPulse 9s linear infinite;
+        }
+
+
+        /* -------------------------------------------------- */
+        /* 2. SEKCE: ORGANISMUS (KONSTELACE SVG)              */
+        /* -------------------------------------------------- */
+        #sec-organismus {
+            padding: 2rem 0;
+        }
+
+        .organismus-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .responsive-svg {
+            width: 100%;
+            height: auto;
+            max-height: 100vh;
+            display: block;
+            object-fit: contain;
+        }
+
+        .svg-desktop { display: block; }
+        .svg-mobile { display: none; }
+
+        @media (max-width: 768px) {
+            .svg-desktop { display: none; }
+            .svg-mobile { display: block; }
+        }
+
+
+        /* -------------------------------------------------- */
+        /* 3. SEKCE: OBRAZOVÁ PŘÍLOHA A POPISKY               */
+        /* -------------------------------------------------- */
+        .gallery-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 2.5rem;
+            width: 100%;
+            max-width: 1000px;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .slider-container {
+            display: flex;
+            width: 100%;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .slider-container::-webkit-scrollbar { display: none; }
+
+        .slide {
+            flex: 0 0 100%;
+            width: 100%;
+            scroll-snap-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide img {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+            display: block;
+            user-select: none;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #111;
+            font-size: 1.5rem;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn:hover {
+            background: #ffffff;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .prev-btn { left: 12px; }
+        .next-btn { right: 12px; }
+
+        /* Skrytá tlačítka (první / poslední fotka) */
+        .nav-btn.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .captions-column {
+            width: 260px;
+            flex-shrink: 0;
+            font-family: 'Coolvetica Book', 'Coolvetica', sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .captions-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            text-align: right;
+        }
+
+        .caption-item {
+            font-size: 1.2rem;
+            color: #000000;
+            cursor: pointer;
+            line-height: 1.25;
+            transition: opacity 0.2s ease;
+        }
+
+        .caption-item:hover { opacity: 0.5; }
+
+        @media (max-width: 850px) {
+            .gallery-layout {
+                flex-direction: column;
+                gap: 1.8rem;
+            }
+            .captions-column { width: 100%; }
+            .captions-list {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.6rem 1.5rem;
+                text-align: left;
+            }
+            .caption-item { font-size: 1.05rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 0. SEKCE: ÚVODNÍ TEXT -->
+    <section id="sec-uvod">
+        <div class="intro-section">
+            <div class="intro-track">
+                <img src="uvod.svg" alt="Úvodní text SUŠ Ostrava" class="intro-svg">
+                <div class="snap-point snap-left"></div>
+                <div class="snap-point snap-right"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 1. SEKCE: OTÁZKY -->
+    <section id="sec-otazky">
+        <div id="otazky-queue">
+            <div class="snake-stage" onclick="spawnQuestion()">
+                <div class="center-info">
+                    <div class="center-hint" id="centerHint">Klepni pro spuštění otázky</div>
+                    <div class="count-badge" id="countBadge">0 / 21</div>
+                </div>
+
+                <svg id="snakeSvg" width="100%" height="100%">
+                    <path id="snakePath" fill="none" stroke="transparent" />
+                    <text id="measurer" class="snake-text" x="-9999" y="-9999" style="visibility: hidden; pointer-events: none;"></text>
+                    <g id="textContainer"></g>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. SEKCE: ORGANISMUS (KONSTELACE) -->
+    <section id="sec-organismus">
+        <div class="organismus-container">
+            <img src="desktop.svg" alt="Organismus Desktop" class="responsive-svg svg-desktop">
+            <img src="mobile.svg" alt="Organismus Mobil" class="responsive-svg svg-mobile">
+        </div>
+    </section>
+
+    <!-- 3. SEKCE: OBRAZOVÁ PŘÍLOHA (GALERIE A POPISKY) -->
+    <section id="sec-obrazky">
+        <main class="gallery-layout">
+            <div class="slider-wrapper">
+                <button class="nav-btn prev-btn" id="prevBtn" aria-label="Předchozí fotka">&#10094;</button>
+                <button class="nav-btn next-btn" id="nextBtn" aria-label="Následující fotka">&#10095;</button>
+
+                <div class="slider-container" id="sliderContainer">
+                    <div class="slide"><img src="a1.webp" alt="kytka na okně" loading="lazy"></div>
+                    <div class="slide"><img src="a2.webp" alt="napnutý papír" loading="lazy"></div>
+                    <div class="slide"><img src="a3.webp" alt="zvednuté židle" loading="lazy"></div>
+                    <div class="slide"><img src="a4.webp" alt="osobní skříňky" loading="lazy"></div>
+                    <div class="slide"><img src="a5.webp" alt="uid tiskárny" loading="lazy"></div>
+                    <div class="slide"><img src="a6.webp" alt="používaný dřez" loading="lazy"></div>
+                    <div class="slide"><img src="a7.webp" alt="škříň s chemií" loading="lazy"></div>
+                    <div class="slide"><img src="a8.webp" alt="koš na papír" loading="lazy"></div>
+                    <div class="slide"><img src="a9.webp" alt="skříňka s papírem" loading="lazy"></div>
+                    <div class="slide"><img src="a10.webp" alt="zatemněná pc room" loading="lazy"></div>
+                    <div class="slide"><img src="a11.webp" alt="manekýna" loading="lazy"></div>
+                    <div class="slide"><img src="a12.webp" alt="skica myšlenek" loading="lazy"></div>
+                    <div class="slide"><img src="a13.webp" alt="radiátor" loading="lazy"></div>
+                    <div class="slide"><img src="a14.webp" alt="skříň s prácemi" loading="lazy"></div>
+                    <div class="slide"><img src="a15.webp" alt="grafický stůl" loading="lazy"></div>
+                    <div class="slide"><img src="a16.webp" alt="klávesnice" loading="lazy"></div>
+                    <div class="slide"><img src="a17.webp" alt="židlička malby" loading="lazy"></div>
+                </div>
+            </div>
+
+            <aside class="captions-column">
+                <ul class="captions-list">
+                    <li class="caption-item" data-index="0">kytka na okně</li>
+                    <li class="caption-item" data-index="1">napnutý papír</li>
+                    <li class="caption-item" data-index="2">zvednuté židle</li>
+                    <li class="caption-item" data-index="3">osobní skříňky</li>
+                    <li class="caption-item" data-index="4">uid tiskárny</li>
+                    <li class="caption-item" data-index="5">používaný dřez</li>
+                    <li class="caption-item" data-index="6">škříň s chemií</li>
+                    <li class="caption-item" data-index="7">koš na papír</li>
+                    <li class="caption-item" data-index="8">skříňka s papírem</li>
+                    <li class="caption-item" data-index="9">zatemněná pc room</li>
+                    <li class="caption-item" data-index="10">manekýna</li>
+                    <li class="caption-item" data-index="11">skica myšlenek</li>
+                    <li class="caption-item" data-index="12">radiátor</li>
+                    <li class="caption-item" data-index="13">skříň s prácemi</li>
+                    <li class="caption-item" data-index="14">grafický stůl</li>
+                    <li class="caption-item" data-index="15">klávesnice</li>
+                    <li class="caption-item" data-index="16">židlička malby</li>
+                </ul>
+            </aside>
+        </main>
+    </section>
+
+    <!-- SKRIPTY PRO OTÁZKY A GALERII -->
+    <script>
+        /* --- LOGIKA SEKCE 1: OTÁZKY (HÁD) --- */
+        const questionsBank = [
+            "Kdy obraz pomáhá a kdy manipuluje?",
+            "Jak to má divák číst?",
+            "Komu věc slouží – a komu ubližuje?",
+            "Jaký rytmus je čitelný?",
+            "Co se stane, když nechám věci vzniknout?",
+            "Kdy mám přestat zasahovat?",
+            "Co se stane, když vydržím déle?",
+            "Je omezení média překážka, nebo podmínka hloubky?",
+            "Je téma důležité, nebo jenom přítomnost?",
+            "Jak se bude měnit význam v čase?",
+            "Kde jsou hranice mezi dokumentem, estetikou a konceptem?",
+            "Je to pravda?",
+            "Co zůstalo mimo záběr?",
+            "Kdy je zásah příliš?",
+            "Manipuluje kompozice?",
+            "Jak dlouho má vydržet – fyzicky i významově?",
+            "Neztrácím příliš času – jak si ulehčit práci?",
+            "Ztratím se, pokud se vrátím o krok zpět?",
+            "Co sděluje?",
+            "Co mě proces naučil?",
+            "Dosáhl*a jsem posunu?"
+        ];
+
+        let currentBankIdx = 0;
+        let questionsSeenCount = 0;
+        let activeQueue = []; 
+        
+        const MAX_ACTIVE_ON_SCREEN = 8;
+        const GAP_BETWEEN = 60;
+        const SPEED = 1.6;
+
+        const snakeSvg = document.getElementById('snakeSvg');
+        const snakePath = document.getElementById('snakePath');
+        const textContainer = document.getElementById('textContainer');
+        const measurer = document.getElementById('measurer');
+        const hint = document.getElementById('centerHint');
+        const badge = document.getElementById('countBadge');
+
+        let pathTotalLength = 0;
+
+        function updatePath() {
+            const w = snakeSvg.clientWidth;
+            const h = snakeSvg.clientHeight;
+            const p = 22;
+            const r = 20;
+
+            const d = `M ${p+r},${p} ` +
+                      `L ${w-p-r},${p} Q ${w-p},${p} ${w-p},${p+r} ` +
+                      `L ${w-p},${h-p-r} Q ${w-p},${h-p} ${w-p-r},${h-p} ` +
+                      `L ${p+r},${h-p} Q ${p},${h-p} ${p},${h-p-r} ` +
+                      `L ${p},${p+r} Q ${p},${p} ${p+r},${p}`;
+
+            snakePath.setAttribute('d', d);
+            pathTotalLength = snakePath.getTotalLength();
+        }
+
+        new ResizeObserver(updatePath).observe(snakeSvg);
+        updatePath();
+
+        function getTextLength(textStr) {
+            measurer.textContent = textStr;
+            let len = 0;
+            try {
+                len = measurer.getComputedTextLength();
+            } catch (e) {}
+            if (!len || len <= 0) {
+                try {
+                    len = measurer.getBBox().width;
+                } catch (e) {}
+            }
+            return len || (textStr.length * 15);
+        }
+
+        function spawnQuestion() {
+            if (activeQueue.length >= MAX_ACTIVE_ON_SCREEN) return;
+
+            hint.style.opacity = '0';
+
+            const textStr = questionsBank[currentBankIdx % questionsBank.length];
+            currentBankIdx++;
+
+            questionsSeenCount++;
+            if (questionsSeenCount > questionsBank.length) {
+                questionsSeenCount = 1;
+            }
+            updateBadge();
+
+            const textLength = getTextLength(textStr);
+
+            const textNode = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            textNode.setAttribute('class', 'snake-text');
+            textNode.setAttribute('dominant-baseline', 'middle');
+
+            const textPathEl = document.createElementNS('http://www.w3.org/2000/svg', 'textPath');
+            textPathEl.setAttribute('href', '#snakePath');
+            textPathEl.textContent = textStr;
+
+            textNode.appendChild(textPathEl);
+            textContainer.appendChild(textNode);
+
+            let startOffset = -textLength;
+
+            if (activeQueue.length > 0) {
+                const lastItem = activeQueue[activeQueue.length - 1];
+                const minAllowedOffset = lastItem.offset - textLength - GAP_BETWEEN;
+                startOffset = Math.min(-textLength, minAllowedOffset);
+            }
+
+            textPathEl.setAttribute('startOffset', startOffset);
+
+            activeQueue.push({
+                groupEl: textNode,
+                pathEl: textPathEl,
+                offset: startOffset,
+                length: textLength
+            });
+        }
+
+        function animateSnake() {
+            for (let i = activeQueue.length - 1; i >= 0; i--) {
+                const item = activeQueue[i];
+                item.offset += SPEED;
+                item.pathEl.setAttribute('startOffset', item.offset);
+
+                if (item.offset - item.length >= pathTotalLength) {
+                    textContainer.removeChild(item.groupEl);
+                    activeQueue.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animateSnake);
+        }
+
+        function updateBadge() {
+            badge.textContent = `${questionsSeenCount} / ${questionsBank.length}`;
+        }
+
+        requestAnimationFrame(animateSnake);
+
+
+        /* --- LOGIKA SEKCE 3: OBRAZOVÁ PŘÍLOHA A SLIDER --- */
+        const slider = document.getElementById('sliderContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const captionItems = document.querySelectorAll('.caption-item');
+
+        nextBtn.addEventListener('click', () => {
+            slider.scrollBy({ left: slider.clientWidth, behavior: 'smooth' });
+        });
+
+        prevBtn.addEventListener('click', () => {
+            slider.scrollBy({ left: -slider.clientWidth, behavior: 'smooth' });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                slider.scrollBy({ left: slider.clientWidth, behavior: 'smooth' });
+            } else if (e.key === 'ArrowLeft') {
+                slider.scrollBy({ left: -slider.clientWidth, behavior: 'smooth' });
+            }
+        });
+
+        captionItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const index = parseInt(item.getAttribute('data-index'));
+                slider.scrollTo({
+                    left: index * slider.clientWidth,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        /* Skrytí pravé šipky na poslední fotce */
+        const slideCount = slider.querySelectorAll('.slide').length;
+
+        function updateNavButtons() {
+            const width = slider.clientWidth;
+            // index aktuální fotky podle pozice posunu (nezávisí na načtení obrázků)
+            const index = width > 0 ? Math.round(slider.scrollLeft / width) : 0;
+            nextBtn.classList.toggle('hidden', index >= slideCount - 1);
+        }
+
+        slider.addEventListener('scroll', updateNavButtons);
+        window.addEventListener('resize', updateNavButtons);
+        window.addEventListener('load', updateNavButtons);
+        new ResizeObserver(updateNavButtons).observe(slider);
+        updateNavButtons();
+    </script>
+
+</body>
+</html>
