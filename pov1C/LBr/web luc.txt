@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>cute hvězdička</h2>
+<img src="pic_trulli.jpg" alt="Trulli" width="500" height="333">
+
+</body>
+</html>
+
+</body>
+</html>
+<img src="gepard.webp">
+</body>
+</html>
+
+<img src="img_chania.jpg" alt="Flowers in Chania">

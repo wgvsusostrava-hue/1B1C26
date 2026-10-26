@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>HTML Image</h2>
+<img src="dino.webp" alt="" width="500" height="600">
+
+<img src="dino.webp.webp">
+</body>
+</html>
+
